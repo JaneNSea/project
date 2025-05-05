@@ -1,0 +1,177 @@
+         :root {
+            --primary: #2b6cb0;
+            --secondary: #c05621;
+        }
+        .dark {
+            --primary: #63b3ed;
+            --secondary: #f6ad55;
+        }
+        .chart-bar {
+            animation: grow 1s ease-out forwards;
+            transform-origin: left;
+        }
+        @keyframes grow {
+            from { transform: scaleX(0); }
+        }
+        .country-card:hover .flag-container {
+            transform: rotateY(180deg);
+        }
+        .flag-container {
+                    transition: transform 0.6s ease;
+                    transform: scale(1);
+                }
+                .country-card:hover .flag-container {
+                    transform: scale(1.2);
+                }
+                /* 自定义动画 */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-slideUp {
+        animation: slideUp 1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    }
+    .animate-fadeIn {
+        animation: fadeIn 1s ease forwards;
+    }
+    .animate-bounce-slow {
+        animation: bounce-slow 2s infinite;
+    }
+
+    .stat-card {
+        position: relative;
+        border-radius: 1rem;
+        padding: 1px;
+        overflow: hidden;
+        transition: transform 0.3s;
+        background: linear-gradient(45deg, 
+            rgba(124, 140, 124, 0.2) 0%, 
+            rgba(124, 140, 124, 0.2) 100%);
+        }
+    .stat-card:hover {
+        transform: scale(1.05);
+    }
+
+
+
+  
+    /* 时间轴动画 */
+    .timeline-item {
+        position: relative;
+        padding-bottom: 4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    @media (min-width: 768px) {
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 2rem;
+        }
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 2rem;
+        }
+    }
+
+    /* 入场动画 */
+    .timeline-item {
+        opacity: 0;
+        transform: translateY(2rem);
+        transition: all 0.5s ease-out;
+    }
+    .timeline-item.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+ 
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(78,205,196,0.5);
+        border-radius: 4px;
+    }
+    .node-card {
+        padding: 1rem;
+        background-color: #ffffff;
+        color: #1f2937;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .node-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .node-card {
+        background-color: #374151;
+        color: #d1d5db;
+        border-color: #4b5563;
+    }
+
+
+   /* 自定义标记样式 */
+    .country-marker {
+        background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        border-radius: 50%;
+        width: 24px!important;
+        height: 24px!important;
+        border: 2px solid white;
+        box-shadow: 0 0 15px #ff6b6b;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .country-marker:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 25px #ff8e53;
+    }
+
+    
+ /* 自定义动画效果 */
+ .person-card {
+    perspective: 1000px;
+}
+
+.person-card img {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.person-card:hover img {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+/* 暗色模式适配 */
+.dark .person-card {
+    --shadow-color: rgba(255,255,255,0.1);
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+    .person-card img {
+        width: 36vw;
+        height: 36vw;
+    }
+}
+
+
+
+
+    
+

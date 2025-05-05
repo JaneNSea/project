@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>义新欧班列数字档案 - 一带一路物流动脉</title>
+    
+    <!-- 样式依赖 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="font-['Inter'] bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg z-50 border-b dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">义新欧数字档案</h1>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="#timeline" class="nav-link">发展历程</a>
+                        <a href="#countries" class="nav-link">途经国家</a>
+                        <a href="#goods" class="nav-link">贸易商品</a>
+                        <a href="#map" class="nav-link">核心地图</a>
+                        <a href="#person" class="nav-link">人物志</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-moon text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+   <!-- 动态首屏 -->
+<header class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- 动态粒子背景 -->
+    <canvas id="particles-canvas" class="absolute inset-0 z-0"></canvas>
+    
+    <!-- 渐变遮罩层 -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#97AC9E]/40 via-transparent to-[#97AC9E]/30 
+        dark:from-[#97AC9E]/70 dark:to-[#97AC9E]/80 backdrop-blur-sm"></div>
+
+    <!-- 视频背景（备用图片） -->
+    <div class="absolute inset-0 z-10 overflow-hidden">
+        <video autoplay muted loop playsinline 
+            class="w-full h-full object-cover opacity-80 dark:opacity-30 transition-opacity 
+                duration-500 hover:opacity-100">
+            <source src="railway.mp4" type="video/mp4">
+            <img src="railway-fallback.jpg" alt="中欧班列" 
+                class="w-full h-full object-cover">
+        </video>
+    </div>
+
+    <!-- 核心内容容器 -->
+    <div class="relative z-20 text-center space-y-8 px-4 max-w-7xl mx-auto">
+        <!-- 主标题组 -->
+        <div class="overflow-hidden">
+            <h1 class="text-4xl md:text-6xl font-bold text-black mb-4 opacity-0 
+                animate-slideUp [animation-delay:200ms]">
+                义新欧中欧班列
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-500 opacity-0 animate-slideUp [animation-delay:400ms]"></p>
+                数字时代的新丝绸之路
+            </p>
+        </div>
+
+        <!-- 动态数据仪表盘 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 opacity-0 
+            animate-fadeIn [animation-delay:600ms]">
+            <!-- 班列统计 -->
+            <div class="stat-card group">
+            <div class="absolute inset-0 bg-gray-200/5 backdrop-blur-lg rounded-2xl 
+            transition-all duration-300 group-hover:bg-gray-200/10"></div>
+            <div class="relative p-6">
+            <div class="text-4xl md:text-5xl font-bold text-gray-500 mb-2" 
+            data-count="11380">0</div>
+            <div class="flex items-center justify-center space-x-2">
+            <i class="fas fa-train text-gray-500"></i>
+            <span class="text-sm text-gray-500">累计开行班列</span>
+            </div>
+            </div>
+            </div>
+
+            <!-- 覆盖国家 -->
+            <div class="stat-card group">
+            <div class="absolute inset-0 bg-gray-200/5 backdrop-blur-lg rounded-2xl 
+            transition-all duration-300 group-hover:bg-gray-200/10"></div>
+            <div class="relative p-6">
+            <div class="text-4xl md:text-5xl font-bold text-gray-500 mb-2" 
+            data-count="50">0</div>
+            <div class="flex items-center justify-center space-x-2">
+            <i class="fas fa-globe-europe text-gray-500"></i>
+            <span class="text-sm text-gray-500">覆盖国家地区</span>
+            </div>
+            </div>
+            </div>
+
+            <!-- 路线里程 -->
+            <div class="stat-card group">
+            <div class="absolute inset-0 bg-gray-200/5 backdrop-blur-lg rounded-2xl 
+            transition-all duration-300 group-hover:bg-gray-200/10"></div>
+            <div class="relative p-6">
+            <div class="text-4xl md:text-5xl font-bold text-gray-500 mb-2" 
+            data-count="13052">0</div>
+            <div class="flex items-center justify-center space-x-2 mt-2">
+            <i class="fas fa-road text-gray-500"></i>
+            <span class="text-sm text-gray-500">最长里程（公里）</span>
+            </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- 实时时钟 -->
+        <div class="absolute top-4 right-4 text-gray-800 text-sm backdrop-blur-sm 
+            bg-gray-200/80 px-3 py-1 rounded-full dark:text-gray-300 dark:bg-gray-700/80">
+            <i class="fas fa-clock mr-2"></i>
+            <span id="realtime-clock">正在加载时间...</span>
+        </div>
+    </div>
+</header>
+
+   <!-- 发展历程时间轴 -->
+<section id="timeline" class="py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-3xl font-bold text-center mb-16 text-gray-900 dark:text-white">
+            发展历程
+            <span class="block mt-2 text-lg text-gray-600 dark:text-gray-400">从首班列车到数字丝路</span>
+        </h3>
+
+        <!-- 时间轴容器 -->
+        <div class="relative">
+            <!-- 时间轴线 -->
+            <div class="absolute left-1/2 w-1 bg-gray-200 dark:bg-gray-700 h-full transform -translate-x-1/2 
+                shadow-lg rounded-full"></div>
+
+            <!-- 时间轴项 - 2014 -->
+            <div class="mb-16 timeline-item">
+                <!-- 时间节点 -->
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-train text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2014.11
+                    </div>
+                </div>
+
+                <!-- 内容卡片 -->
+                <div class="relative md:w-1/2 mt-20 md:mt-0">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            首班启程
+                            <span class="text-sm text-blue-500 ml-2">历史性突破</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2014年11月18日，首趟"义新欧"国际铁路货运班列从浙江义乌西站出发，经新疆阿拉山口口岸出境，历时21天抵达西班牙马德里，全程13,052公里
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2016 -->
+            <div class="mb-16 timeline-item md:flex-row-reverse">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-green-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-calendar-check text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2016.03
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0 md:ml-auto">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            常态运营
+                            <span class="text-sm text-green-500 ml-2">重要里程碑</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2016年3月实现每周定期双向对开，全年累计开行100列，标志义新欧班列正式进入常态化、规模化运营阶段
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2018 -->
+            <div class="mb-16 timeline-item">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-orange-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-globe text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2018.05
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            网络扩展
+                            <span class="text-sm text-orange-500 ml-2">全球化布局</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2018年5月，义新欧班列覆盖国家和地区增至50个，开通线路超过10条，成为“一带一路”倡议的重要物流通道。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2020 -->
+            <div class="mb-16 timeline-item md:flex-row-reverse">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-red-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-shield-alt text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2020.06
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0 md:ml-auto">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            疫情期间保障
+                            <span class="text-sm text-red-500 ml-2">关键时刻</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2020年新冠疫情期间，义新欧班列成为国际物流的重要保障，全年开行量突破1000列，运输医疗物资超过10万吨。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2022 -->
+            <div class="mb-16 timeline-item">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-purple-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-chart-line text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2022.09
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            数字化升级
+                            <span class="text-sm text-purple-500 ml-2">创新驱动</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2022年9月，义新欧班列全面引入数字化管理系统，实现货物全程可视化追踪，进一步提升物流效率与服务质量。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2023 -->
+            <div class="mb-16 timeline-item md:flex-row-reverse">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-teal-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-leaf text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2023.04
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0 md:ml-auto">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            绿色物流
+                            <span class="text-sm text-teal-500 ml-2">可持续发展</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2023年4月，义新欧班列启动绿色物流计划，采用新能源动力机车，减少碳排放，助力全球可持续发展目标。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间轴项 - 2024 -->
+            <div class="mb-16 timeline-item">
+                <div class="absolute left-1/2 -translate-x-1/2 -translate-y-7 z-10">
+                    <div class="flex items-center justify-center w-14 h-14 bg-yellow-500 rounded-full shadow-xl
+                        transition-transform hover:scale-110">
+                        <i class="fas fa-lightbulb text-2xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold 
+                        text-gray-600 dark:text-gray-300">
+                        2024.01
+                    </div>
+                </div>
+
+                <div class="relative md:w-1/2 mt-20 md:mt-0">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100
+                        dark:border-gray-700 transition-all hover:shadow-2xl">
+                        <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            智能化升级
+                            <span class="text-sm text-yellow-500 ml-2">未来展望</span>
+                        </h4>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            2024年1月，义新欧班列引入人工智能调度系统，实现运输效率最大化，进一步巩固其在国际物流中的领先地位。
+                        </p>
+                    </div>
+                </div>
+            </div></div>
+        </div>
+    </div>
+</section>
+
+    <!-- 途经国家 -->
+<section id="countries" class="py-20 bg-[#97AC9E] dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-3xl font-bold mb-12 text-center">主要途经国家</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 中国 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="中国.svg" alt="中国" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">中国</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要站点：义乌、西安、郑州</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要出口：电子产品、日用品</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：2-3天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 哈萨克斯坦 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="哈萨克斯坦.svg" alt="哈萨克斯坦" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">哈萨克斯坦</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>关键枢纽：阿拉山口、多斯特克</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：石油制品、矿产</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约1-2天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 俄罗斯 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="俄罗斯.svg" alt="俄罗斯" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">俄罗斯</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：莫斯科、叶卡捷琳堡</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：木材、化工产品</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约7-10天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 德国 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="德国国旗.svg" alt="德国" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">德国</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要站点：杜伊斯堡、汉堡</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：机械设备、汽车</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约1-2天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 波兰 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="波兰.svg" alt="波兰" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">波兰</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>关键枢纽：马拉舍维奇</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：食品、家具</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5-1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 西班牙 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="西班牙.svg" alt="西班牙" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">西班牙</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：马德里</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：葡萄酒、橄榄油</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约2-3天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 荷兰 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="荷兰.svg" alt="荷兰" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">荷兰</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：鹿特丹</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：花卉、奶制品</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 意大利 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="意大利.svg" alt="意大利" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">意大利</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：米兰</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：服装、家具</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约2-3天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 法国 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="法国国旗.svg" alt="法国" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">法国</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：巴黎</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：奢侈品、葡萄酒</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约1-2天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 比利时 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="比利时.svg" alt="比利时" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">比利时</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：布鲁塞尔</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：巧克力、钻石</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5-1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 瑞士 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="瑞士.svg" alt="瑞士" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">瑞士</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：苏黎世</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：手表、金融服务</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 奥地利 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="奥地利.svg" alt="奥地利" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">奥地利</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：维也纳</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：钢铁、化工产品</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5-1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 捷克 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="捷克.svg" alt="捷克" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">捷克</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：布拉格</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：啤酒、汽车零部件</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5-1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 匈牙利 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="匈牙利.svg" alt="匈牙利" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">匈牙利</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：布达佩斯</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：药品、电子设备</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约1天</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 斯洛伐克 -->
+                <div class="country-card group">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 transition-all hover:shadow-lg">
+                        <div class="flag-container w-20 h-20 mx-auto mb-4">
+                            <img src="斯洛伐克.svg" alt="斯洛伐克" 
+                                 class="w-full h-full object-contain rounded-full shadow-md">
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2 text-center">斯洛伐克</h4>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p><i class="fas fa-route mr-2"></i>主要城市：布拉迪斯拉发</p>
+                            <p><i class="fas fa-boxes mr-2"></i>主要贸易：汽车、钢铁</p>
+                            <p><i class="fas fa-clock mr-2"></i>过境时间：约0.5天</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+
+    <!-- 贸易商品 -->
+<section id="goods" class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-3xl font-bold mb-12 text-center">主要运输商品</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 商品卡片 -->
+                <div class="goods-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-laptop-code text-3xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">电子产品</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">占比约25%，包括电脑配件、通讯设备等</p>
+                    <div class="mt-4 bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
+                        <div class="bg-blue-500 h-2 rounded-full w-3/5"></div>
+                    </div>
+                </div>
+
+                <!-- 更多商品类型 -->
+                <div class="goods-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-cogs text-3xl text-orange-600 dark:text-orange-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">机械部件</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">占比12%，汽车配件、工业设备等</p>
+                    <div class="mt-4 bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
+                        <div class="bg-orange-500 h-2 rounded-full w-[45%]"></div>
+                    </div>
+                </div>
+
+               
+
+                <div class="goods-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-tshirt text-3xl text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">纺织品</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">占比15%，服装、家纺等</p>
+                    <div class="mt-4 bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
+                        <div class="bg-red-500 h-2 rounded-full w-[35%]"></div>
+                    </div>
+                </div>
+
+                <div class="goods-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-box text-3xl text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">日用品</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">占比40%，包括家具、玩具等</p>
+                    <div class="mt-4 bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
+                        <div class="bg-yellow-500 h-2 rounded-full w-[30%]"></div>
+                    </div>
+                </div>
+
+               
+
+                
+            </div>
+        </div>
+</section>
+
+    <!-- 路线图演示 -->
+<section id="map" class="py-20 bg-white dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    核心路线网络
+                    <span class="block mt-2 text-lg text-gray-600 dark:text-gray-400">点击播放按钮查看实时路线规划</span>
+                </h3>
+            </div>
+    
+            <!-- 双栏布局 -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- 地图容器 (左70%) -->
+                <div class="lg:w-[70%] relative h-[600px] rounded-2xl overflow-hidden shadow-xl">
+                    <div id="dynamic-map" class="w-full h-full bg-white-100 dark:bg-white-800">
+                        <img src="./图片1.png" alt="路线预览" 
+                            class="w-full h-full object-cover transition-opacity duration-500"
+                            id="map-preview">
+                    </div>
+    
+                    <!-- 播放控制 -->
+                    <button id="play-route" 
+                        class="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 
+                        bg-green-600 hover:bg-blue-700 text-white rounded-full 
+                        shadow-lg transition-all flex items-center gap-2">
+                        <i class="fas fa-play"></i>
+                        <span>开始路线演示</span>
+                    </button>
+                </div>
+    
+                <!-- 节点信息面板 -->
+                <div class="lg:w-[30%]">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg h-[600px] 
+                        overflow-y-auto custom-scrollbar">
+                        <h4 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                            关键节点信息
+                            <span class="block text-sm font-normal text-gray-500 mt-1">
+                                当前节点：<span id="current-node">-</span>
+                            </span>
+                        </h4>
+    
+                        <div id="node-info" class="space-y-6">
+                            <div class="text-center py-12 text-gray-400">
+                                点击播放按钮开始演示
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 路线统计 -->
+            <div class="mt-12 grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-white dark:bg-gray-700 rounded-lg flex items-center 
+                        justify-center mx-auto mb-4">
+                        <i class="fas fa-route text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">主线长度</h4>
+                    <p class="text-gray-600 dark:text-gray-400">13,052公里</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-white dark:bg-gray-700 rounded-lg flex items-center 
+                        justify-center mx-auto mb-4">
+                        <i class="fas fa-clock text-orange-600 dark:text-orange-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">平均时效</h4>
+                    <p class="text-gray-600 dark:text-gray-400">16-18天</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-white dark:bg-gray-700 rounded-lg flex items-center 
+                        justify-center mx-auto mb-4">
+                        <i class="fas fa-city text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h4 class="font-semibold mb-2">途经城市</h4>
+                    <p class="text-gray-600 dark:text-gray-400">30+个主要城市</p>
+                </div>
+            </div>
+        </div>
+</section>
+    
+  <!--人物志 -->
+<section id="person" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 标题部分 -->
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                铁路先锋人物志
+                <span class="block mt-2 text-lg text-gray-600 dark:text-gray-400">探索背后的建设者故事</span>
+            </h2>
+        </div>
+
+        <!-- 人物卡片容器 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 人物卡片模板 -->
+            <div class="person-card group">
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                    <!-- 人物照片 -->
+                    <div class="relative pt-[60%]">
+                        <img src="黄伟.jpg" 
+                             alt="黄伟"
+                             class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 object-cover rounded-full border-4 border-white dark:border-gray-700 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    
+                    <!-- 人物信息 -->
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            黄伟
+                            <span class="block text-sm font-normal text-blue-600 dark:text-blue-400 mt-1">
+                                中欧班列司机长
+                            </span>
+                        </h3>
+                        
+                        <!-- 分隔线 -->
+                        <div class="my-4 h-px bg-gray-200 dark:bg-gray-600 w-3/4 mx-auto"></div>
+                        
+                        <!-- 人物简介 -->
+                        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                            他的日常工作是驾驶内燃机车将零散分布的货物车厢编组成列，牵引停放到指定位置，再交由电力机车接力驶向目的地。“义新欧”中欧班列，从浙江义乌到西班牙马德里，13052公里，黄伟已经陪伴这条全球最长的货运专线十一年了，他见证了义乌中欧班列的发展，也见证了“一带一路”的发展。
+                        </p>
+                        
+                        <!-- 荣誉徽章 -->
+                        <div class="mt-4 flex justify-center space-x-2">
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs rounded-full">
+                                第一棒
+                            </span>
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 text-xs rounded-full">
+                                最后一棒
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="person-card group">
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                    <!-- 人物照片 -->
+                    <div class="relative pt-[60%]">
+                        <img src="冯旭斌.webp" 
+                             alt="冯旭斌"
+                             class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 object-cover rounded-full border-4 border-white dark:border-gray-700 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    
+                    <!-- 人物信息 -->
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            冯旭斌
+                            <span class="block text-sm font-normal text-blue-600 dark:text-blue-400 mt-1">
+                                中国口岸协会副会长 中欧班列运营方负责人
+                            </span>
+                        </h3>
+                        
+                        <!-- 分隔线 -->
+                        <div class="my-4 h-px bg-gray-200 dark:bg-gray-600 w-3/4 mx-auto"></div>
+                        
+                        <!-- 人物简介 -->
+                        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                            2010年，看好国际物流的冯旭斌筹备成立中欧班列运营公司。历经无数次的受挫，冯旭斌也想过放弃的，但此时恰逢习近平主席在哈萨克斯坦访问，提出建设“丝绸之路经济带”，这再次燃起冯旭斌的斗志，于是他着手组织义乌—中亚五国班列，也就是“义新欧”的前身。他积极投身“一带一路”建设。
+                        </p>
+                        
+                        <!-- 荣誉徽章 -->
+                        <div class="mt-4 flex justify-center space-x-2">
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs rounded-full">
+                                钢铁驼队
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="person-card group">
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                    <!-- 人物照片 -->
+                    <div class="relative pt-[60%]">
+                        <img src="钟雁轩.jpg" 
+                             alt="钟雁轩"
+                             class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 object-cover rounded-full border-4 border-white dark:border-gray-700 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    
+                    <!-- 人物信息 -->
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            钟雁轩
+                            <span class="block text-sm font-normal text-blue-600 dark:text-blue-400 mt-1">
+                                义新欧班列检车员
+                            </span>
+                        </h3>
+                        
+                        <!-- 分隔线 -->
+                        <div class="my-4 h-px bg-gray-200 dark:bg-gray-600 w-3/4 mx-auto"></div>
+                        
+                        <!-- 人物简介 -->
+                        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                            只要货运列车有运输计划，检车员就必须全天候待命，保质保量完成车辆出发前的检查，保证列车能准点发车，哪怕是春节假期，钟雁轩也时刻和他的同事们坚守岗位，守护这条“钢铁丝路”。钟雁轩说：“我们是义新欧班列的守护者，只有我们把车检好，才能让它安全出发。”
+                        </p>
+                        
+                        <!-- 荣誉徽章 -->
+                        <div class="mt-4 flex justify-center space-x-2">
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs rounded-full">
+                                丝路卫士
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</section>
+
+
+
+ <!-- 页脚 -->
+<footer class="bg-gray-800 text-gray-300 py-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="mb-4">网站开发：王振宇 陈睿 高峰 詹佳鑫</p>
+        <p class="mb-4">数据收集：王佳琪 田子墨 魏君笑 </p>
+        <p class="mb-4">(按照姓氏笔画排列，排名不分先后)</p>
+        <p class="text-sm">© 2025 义新欧班列数字档案</p>
+    </div>
+</footer>
+
+    <script src="./app.js"></script>
+</body>
+</html>
